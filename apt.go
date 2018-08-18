@@ -2,7 +2,7 @@ package main
 
 import (
 	"bytes"
-	"github.com/Al2Klimov/masif-upgrader/common"
+	"github.com/masif-upgrader/common"
 	"os"
 	"os/exec"
 	"regexp"

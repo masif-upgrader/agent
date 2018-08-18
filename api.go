@@ -5,7 +5,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"github.com/Al2Klimov/masif-upgrader/common"
+	"github.com/masif-upgrader/common"
 	"io/ioutil"
 	"net/http"
 )

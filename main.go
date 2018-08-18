@@ -4,7 +4,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"github.com/Al2Klimov/masif-upgrader/common"
+	"github.com/masif-upgrader/common"
 	"gopkg.in/ini.v1"
 	"os"
 	"syscall"
