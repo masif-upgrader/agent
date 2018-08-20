@@ -1,12 +1,16 @@
+//go:generate go run gen1.go
+//go:generate go run gen2.go GithubcomAl2klimovGogeneratedeps.go
+
 package main
 
 import (
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/go-ini/ini"
 	"github.com/masif-upgrader/common"
-	"gopkg.in/ini.v1"
 	"os"
+	"strings"
 	"syscall"
 	"time"
 )
@@ -164,6 +168,11 @@ func loadCfg() (config *settings, err error) {
 	flag.Parse()
 
 	if *cfgFile == "" {
+		fmt.Printf(
+			"For the terms of use, the source code and the authors\nsee the projects this program is assembled from:\n\n  %s\n\n",
+			strings.Join(GithubcomMasif_upgraderCommon, "\n  "),
+		)
+
 		return nil, errors.New("config file missing")
 	}
 
