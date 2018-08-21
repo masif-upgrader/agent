@@ -19,7 +19,7 @@ import (
 
 type settings struct {
 	interval struct {
-		check, report int64
+		check, report, retry int64
 	}
 	master struct {
 		host string
@@ -28,6 +28,9 @@ type settings struct {
 		cert, key, ca string
 	}
 }
+
+var zeroTime = time.Duration(0)
+var retryInterval time.Duration
 
 func main() {
 	if err := runAgent(); err != nil {
@@ -61,17 +64,21 @@ func runAgent() error {
 		return errors.New("package manager not available or not supported")
 	}
 
-	var errWIUA error
 	var tasks map[common.PkgMgrTask]struct{} = nil
+	retryInterval = time.Duration(cfg.interval.retry) * time.Second
 	approvedTasks := map[common.PkgMgrTask]struct{}{}
 	interval := struct{ check, report time.Duration }{
 		check:  time.Duration(cfg.interval.check) * time.Second,
 		report: time.Duration(cfg.interval.report) * time.Second,
 	}
+	whatIfUpgradeAll := func() (err error) {
+		tasks, err = ourPkgMgr.whatIfUpgradeAll(sigListener)
+		return
+	}
 
 	for {
 		if tasks == nil {
-			if tasks, errWIUA = ourPkgMgr.whatIfUpgradeAll(sigListener); errWIUA != nil {
+			if errWIUA := retryOp(whatIfUpgradeAll); errWIUA != nil {
 				return errWIUA
 			}
 		}
@@ -86,9 +93,13 @@ func runAgent() error {
 			}
 
 			if len(notApprovedTasks) > 0 {
+				var freshApprovedTasks map[common.PkgMgrTask]struct{}
 				tasks = nil
 
-				freshApprovedTasks, errRT := master.reportTasks(notApprovedTasks)
+				errRT := retryOp(func() (err error) {
+					freshApprovedTasks, err = master.reportTasks(notApprovedTasks)
+					return
+				})
 				if errRT != nil {
 					return errRT
 				}
@@ -100,7 +111,7 @@ func runAgent() error {
 
 			for {
 				if tasks == nil {
-					if tasks, errWIUA = ourPkgMgr.whatIfUpgradeAll(sigListener); errWIUA != nil {
+					if errWIUA := retryOp(whatIfUpgradeAll); errWIUA != nil {
 						return errWIUA
 					}
 				}
@@ -113,7 +124,12 @@ func runAgent() error {
 					if _, isApproved := approvedTasks[task]; isApproved && task.Action == common.PkgMgrUpdate {
 						tasks = nil
 
-						tasksOnUpgrade, errWIU := ourPkgMgr.whatIfUpgrade(sigListener, task.PackageName)
+						var tasksOnUpgrade map[common.PkgMgrTask]struct{}
+
+						errWIU := retryOp(func() (err error) {
+							tasksOnUpgrade, err = ourPkgMgr.whatIfUpgrade(sigListener, task.PackageName)
+							return
+						})
 						if errWIU != nil {
 							return errWIU
 						}
@@ -139,12 +155,16 @@ func runAgent() error {
 				tasks = nil
 
 				if errU := ourPkgMgr.upgrade(sigListener, nextPackage); errU != nil {
-					return errU
+					if retryInterval == zeroTime {
+						return errU
+					}
+
+					time.Sleep(retryInterval)
 				}
 			}
 
 			if tasks == nil {
-				if tasks, errWIUA = ourPkgMgr.whatIfUpgradeAll(sigListener); errWIUA != nil {
+				if errWIUA := retryOp(whatIfUpgradeAll); errWIUA != nil {
 					return errWIUA
 				}
 			}
@@ -161,8 +181,6 @@ func runAgent() error {
 			time.Sleep(interval.check)
 		}
 	}
-
-	return nil
 }
 
 func loadCfg() (config *settings, err error) {
@@ -186,9 +204,10 @@ func loadCfg() (config *settings, err error) {
 	cfgInterval := cfg.Section("interval")
 	cfgTls := cfg.Section("tls")
 	result := &settings{
-		interval: struct{ check, report int64 }{
+		interval: struct{ check, report, retry int64 }{
 			check:  cfgInterval.Key("check").MustInt64(),
 			report: cfgInterval.Key("report").MustInt64(),
+			retry:  cfgInterval.Key("retry").MustInt64(),
 		},
 		master: struct{ host string }{
 			host: cfg.Section("master").Key("host").String(),
@@ -208,6 +227,10 @@ func loadCfg() (config *settings, err error) {
 		return nil, errors.New("config: interval.report missing")
 	}
 
+	if result.interval.retry <= 0 {
+		result.interval.retry = 0
+	}
+
 	if result.master.host == "" {
 		return nil, errors.New("config: master.host missing")
 	}
@@ -225,4 +248,14 @@ func loadCfg() (config *settings, err error) {
 	}
 
 	return result, nil
+}
+
+func retryOp(op func() error) (err error) {
+	for {
+		if err = op(); err == nil || retryInterval == zeroTime {
+			return
+		}
+
+		time.Sleep(retryInterval)
+	}
 }
