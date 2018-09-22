@@ -1,0 +1,22 @@
+language: go
+
+go:
+  - "1.x"
+  - master
+
+before_script:
+  - gem install fpm
+
+script:
+  - .travis-ci/mk-pkgs.sh
+
+deploy:
+  provider: releases
+  api_key:
+     secure: Xma3nJjkAt7/nCO7zoAdw36Wnd0ACuUhxxrMeHqStMU4zMZjCkCZX49tAbq2fvscpcYPnjlJSZvSDQqEzZ9PbwTuON5T3uqOB3OTjysfB2pc1zzxcMgj5coJ/p+pQiiAe/5Y9J81e6JNFycb2L+yGPDE2uYR7V8Wef7tQGxj3GHAMpZckQLiApWCv7lFdOfT16OCYjvasfOssZ53DKZMTmbPvcyftGbDYm69o+Db7cb8Z/RAvbKvHUqoToiFpjLv0ZIIiOHkkep1qGrVnsjF8ftjuajBS0tKc+OL0Lpd5U08HTSJvn7L5V4Z4RYb1yNYMZLEsDo33qIWgWQIyYKiwFW5A+5aITrWnIawNAocEPkdIbOkpx8f0cGC/KFfgryI9qjbNBNaELjS+bLRXEafceGuOLUaqR4wAHNbFKg7lFhbN8ygt4DaTL0M+a49bPbOfMJ7IHMER6qxkVo+AP648hfMR21chzBBeSnG6TNO4HDLrbJHbCGt7RoEPOYlq4+o2soE3XoZCRAu1aM5otz81rxELuJzBw2ZTlax8/xjX23r7gnaEPaU9ECqghfz2P+u9zrPkap1xoQSZecqw+WXXbmJovr2k7ZBwQZb9moZZ/2cJHAhLyEMN1/Yc/k8xEa/2qNW8A6ikkswPoTeZVBIq5vfs2FcDN9bw++581MOGOQ=
+  file_glob: true
+  file: masif-*.deb
+  skip_cleanup: true
+  on:
+    tags: true
+    go: "1.x"

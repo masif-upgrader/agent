@@ -1,0 +1,14 @@
+[Unit]
+Description=Masif Upgrader (agent)
+After=syslog.target
+
+[Service]
+ExecStart=/usr/sbin/masif-upgrader-agent --config /etc/masif-upgrader/agent.ini
+StandardOutput=syslog
+StandardError=syslog
+KillMode=process
+TimeoutStopSec=infinity
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
