@@ -8,9 +8,10 @@ set -x
 function mkDeb {
 	ARGS=("$@")
 
-	GO_ARCH="${ARGS[0]}"
+	LSBDISTID="${ARGS[0]}"
 	DEB_ARCH="${ARGS[1]}"
-	GO_ENV=('GOOS=linux' "GOARCH=$GO_ARCH" "${ARGS[@]:2}")
+	GO_ARCH="${ARGS[2]}"
+	GO_ENV=('GOOS=linux' "GOARCH=$GO_ARCH" "${ARGS[@]:3}")
 
 	GO_OUT="$(echo "${GO_ENV[@]}")"
 	GO_OUT="${GO_OUT//=/_}"
@@ -45,7 +46,7 @@ function mkDeb {
 Consult Masif Upgrader'"'"'s manual on its purpose and the agent'"'"'s role in its architecture:
 https://github.com/masif-upgrader/manual' \
 		--url 'https://github.com/masif-upgrader/agent' \
-		-p "${PKG_NAME}-${PKG_VERSION}-${DEB_ARCH}.deb" \
+		-p "${PKG_NAME}-${PKG_VERSION}-${LSBDISTID}-${DEB_ARCH}.deb" \
 		-d apt -d bash -d systemd --no-auto-depends \
 		--config-files /etc/masif-upgrader/agent.ini \
 		--after-install packaging/daemon-reload.sh --after-upgrade packaging/daemon-reload.sh --after-remove packaging/daemon-reload.sh \
@@ -68,20 +69,20 @@ cp packaging/systemd.service pkgroot/lib/systemd/system/masif-upgrader-agent.ser
 
 go generate
 
-mkDeb amd64 amd64 GO386=387
-mkDeb 386 i386 GO386=387
+#     LSBDISTID DEB_ARCH GO_ARCH  GO_ENV
 
-mkDeb mips mips GOMIPS=softfloat
-mkDeb mipsle mipsel GOMIPS=softfloat
-mkDeb mips64le mips64el
+mkDeb Debian    amd64    amd64    GO386=387
+mkDeb Debian    i386     386      GO386=387
 
-mkDeb ppc64le ppc64el
-mkDeb s390x s390x
+mkDeb Debian    mips     mips     GOMIPS=softfloat
+mkDeb Debian    mipsel   mipsle   GOMIPS=softfloat
+mkDeb Debian    mips64el mips64le
 
-mkDeb arm armel GOARM=5
-mkDeb arm armhf GOARM=7
-mkDeb arm64 arm64
+mkDeb Debian    ppc64el  ppc64le
+mkDeb Debian    s390x    s390x
 
-mkDeb arm armv6l GOARM=6
-mkDeb arm armv7l GOARM=7
-mkDeb arm64 aarch64
+mkDeb Debian    armel    arm      GOARM=5
+mkDeb Debian    armhf    arm      GOARM=7
+mkDeb Debian    arm64    arm64
+
+mkDeb Raspbian  armhf    arm      GOARM=6
