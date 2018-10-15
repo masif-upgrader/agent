@@ -25,6 +25,25 @@
   pruneopts = "UT"
   revision = "7e768493331e53a0aca419ea92ce9e36b872245f"
 
+[[projects]]
+  branch = "master"
+  digest = "1:3f3a05ae0b95893d90b9b3b5afdb79a9b3d96e4e36e099d841ae602e4aca0da8"
+  name = "golang.org/x/crypto"
+  packages = ["ssh/terminal"]
+  pruneopts = "UT"
+  revision = "0c41d7ab0a0ee717d4590a44bcb987dfd9e183eb"
+
+[[projects]]
+  branch = "master"
+  digest = "1:f5aa274a0377f85735edc7fedfb0811d3cbc20af91633797cb359e29c3272271"
+  name = "golang.org/x/sys"
+  packages = [
+    "unix",
+    "windows",
+  ]
+  pruneopts = "UT"
+  revision = "fa43e7bc11baaae89f3f902b2b4d832b68234844"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
@@ -32,6 +51,7 @@
     "github.com/Al2Klimov/go-gen-source-repos",
     "github.com/go-ini/ini",
     "github.com/masif-upgrader/common",
+    "golang.org/x/crypto/ssh/terminal",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

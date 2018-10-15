@@ -37,6 +37,10 @@
   branch = "master"
   name = "github.com/masif-upgrader/common"
 
+[[constraint]]
+  branch = "master"
+  name = "golang.org/x/crypto"
+
 [prune]
   go-tests = true
   unused-packages = true

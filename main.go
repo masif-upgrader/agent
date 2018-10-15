@@ -9,6 +9,7 @@ import (
 	_ "github.com/Al2Klimov/go-gen-source-repos"
 	"github.com/go-ini/ini"
 	"github.com/masif-upgrader/common"
+	"golang.org/x/crypto/ssh/terminal"
 	"os"
 	"strings"
 	"syscall"
@@ -31,6 +32,15 @@ var zeroTime = time.Duration(0)
 var retryInterval time.Duration
 
 func main() {
+	if len(os.Args) == 1 && terminal.IsTerminal(int(os.Stdout.Fd())) {
+		fmt.Printf(
+			"For the terms of use, the source code and the authors\n"+
+				"see the projects this program is assembled from:\n\n  %s\n",
+			strings.Join(GithubcomAl2klimovGo_gen_source_repos, "\n  "),
+		)
+		os.Exit(1)
+	}
+
 	if err := runAgent(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -186,11 +196,6 @@ func loadCfg() (config *settings, err error) {
 	flag.Parse()
 
 	if *cfgFile == "" {
-		fmt.Printf(
-			"For the terms of use, the source code and the authors\nsee the projects this program is assembled from:\n\n  %s\n\n",
-			strings.Join(GithubcomAl2klimovGo_gen_source_repos, "\n  "),
-		)
-
 		return nil, errors.New("config file missing")
 	}
 
