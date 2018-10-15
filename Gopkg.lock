@@ -18,12 +18,28 @@
   version = "v1.38.2"
 
 [[projects]]
+  digest = "1:0a69a1c0db3591fcefb47f115b224592c8dfa4368b7ba9fae509d5e16cdc95c8"
+  name = "github.com/konsorten/go-windows-terminal-sequences"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "5c8c8bd35d3832f5d134ae1e1e375b69a4d25242"
+  version = "v1.0.1"
+
+[[projects]]
   branch = "master"
   digest = "1:61bb9b25ef7cf22683e8c6657d56633e7840ca4d13e5a0e5521b5f281e4fc549"
   name = "github.com/masif-upgrader/common"
   packages = ["."]
   pruneopts = "UT"
   revision = "7e768493331e53a0aca419ea92ce9e36b872245f"
+
+[[projects]]
+  digest = "1:3f53e9e4dfbb664cd62940c9c4b65a2171c66acd0b7621a1a6b8e78513525a52"
+  name = "github.com/sirupsen/logrus"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "ad15b42461921f1fb3529b058c6786c6a45d5162"
+  version = "v1.1.1"
 
 [[projects]]
   branch = "master"
@@ -51,6 +67,7 @@
     "github.com/Al2Klimov/go-gen-source-repos",
     "github.com/go-ini/ini",
     "github.com/masif-upgrader/common",
+    "github.com/sirupsen/logrus",
     "golang.org/x/crypto/ssh/terminal",
   ]
   solver-name = "gps-cdcl"

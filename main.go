@@ -9,6 +9,7 @@ import (
 	_ "github.com/Al2Klimov/go-gen-source-repos"
 	"github.com/go-ini/ini"
 	"github.com/masif-upgrader/common"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ssh/terminal"
 	"os"
 	"strings"
@@ -26,10 +27,21 @@ type settings struct {
 	tls struct {
 		cert, key, ca string
 	}
+	log struct {
+		level log.Level
+	}
 }
 
 var zeroTime = time.Duration(0)
 var retryInterval time.Duration
+var logLevels = map[string]log.Level{
+	"error":   log.ErrorLevel,
+	"err":     log.ErrorLevel,
+	"warning": log.WarnLevel,
+	"warn":    log.WarnLevel,
+	"info":    log.InfoLevel,
+	"debug":   log.DebugLevel,
+}
 
 func main() {
 	if len(os.Args) == 1 && terminal.IsTerminal(int(os.Stdout.Fd())) {
@@ -41,9 +53,11 @@ func main() {
 		os.Exit(1)
 	}
 
+	log.SetOutput(os.Stdout)
+	log.SetLevel(log.DebugLevel)
+
 	if err := runAgent(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 }
 
@@ -57,6 +71,8 @@ func runAgent() error {
 	if errLC != nil {
 		return errLC
 	}
+
+	log.SetLevel(cfg.log.level)
 
 	master, errNA := newApi(cfg.master.host, cfg.tls)
 	if errNA != nil {
@@ -248,6 +264,14 @@ func loadCfg() (config *settings, err error) {
 
 	if result.tls.ca == "" {
 		return nil, errors.New("config: tls.ca missing")
+	}
+
+	if rawLogLvl := cfg.Section("log").Key("level").String(); rawLogLvl == "" {
+		result.log.level = log.InfoLevel
+	} else if logLvl, logLvlValid := logLevels[rawLogLvl]; logLvlValid {
+		result.log.level = logLvl
+	} else {
+		return nil, errors.New("config: bad log.level")
 	}
 
 	return result, nil
