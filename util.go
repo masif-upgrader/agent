@@ -1,6 +1,21 @@
 package main
 
-import "os/exec"
+import (
+	"fmt"
+	"os/exec"
+)
+
+type lazyLogString struct {
+	stringer fmt.Stringer
+}
+
+func (s lazyLogString) String() string {
+	return s.stringer.String()
+}
+
+func (s lazyLogString) MarshalText() (text []byte, err error) {
+	return []byte(s.stringer.String()), nil
+}
 
 func getExePath(exe string) (path string, err error) {
 	path, errLP := exec.LookPath(exe)

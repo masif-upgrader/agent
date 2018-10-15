@@ -62,11 +62,6 @@ func main() {
 }
 
 func runAgent() error {
-	sigListener := &signalListener{}
-	sigListener.onSignals(func(sig os.Signal) {
-		os.Exit(0)
-	}, syscall.SIGTERM, syscall.SIGINT)
-
 	cfg, errLC := loadCfg()
 	if errLC != nil {
 		return errLC
@@ -74,10 +69,18 @@ func runAgent() error {
 
 	log.SetLevel(cfg.log.level)
 
+	sigListener := &signalListener{}
+	sigListener.onSignals(func(sig os.Signal) {
+		log.WithFields(log.Fields{"signal": lazyLogString{sig}}).Warn("Caught signal, exiting")
+		os.Exit(0)
+	}, syscall.SIGTERM, syscall.SIGINT)
+
 	master, errNA := newApi(cfg.master.host, cfg.tls)
 	if errNA != nil {
 		return errNA
 	}
+
+	log.Debug("Auto-detecting package manager")
 
 	ourPkgMgr, errPM := newApt()
 	if errPM != nil {
@@ -87,6 +90,8 @@ func runAgent() error {
 	if ourPkgMgr == nil {
 		return errors.New("package manager not available or not supported")
 	}
+
+	log.WithFields(log.Fields{"package_manager": ourPkgMgr.getName()}).Info("Auto-detected package manager")
 
 	var tasks map[common.PkgMgrTask]struct{} = nil
 	retryInterval = time.Duration(cfg.interval.retry) * time.Second
