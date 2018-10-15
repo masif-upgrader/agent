@@ -3,11 +3,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:b0a63d63e82f19f7d695e9c389876d0fc8c6991f5b32c79fecf88b67cc6bac6b"
-  name = "github.com/Al2Klimov/go-generate-deps"
+  digest = "1:23f6ffccb3e18e44df23d4e9d5139ed6d5be0cec9f0e0d452484c2e562108116"
+  name = "github.com/Al2Klimov/go-gen-source-repos"
   packages = ["."]
   pruneopts = "UT"
-  revision = "4a1a324a63feaa6d1f774edba1e090f67d9239f3"
+  revision = "9dfcdbdf9942cbfed94478d3c028afb3aad0c4a1"
 
 [[projects]]
   digest = "1:5abd6a22805b1919f6a6bca0ae58b13cef1f3412812f38569978f43ef02743d4"
@@ -29,7 +29,7 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
-    "github.com/Al2Klimov/go-generate-deps",
+    "github.com/Al2Klimov/go-gen-source-repos",
     "github.com/go-ini/ini",
     "github.com/masif-upgrader/common",
   ]
