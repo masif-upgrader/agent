@@ -1,20 +1,19 @@
 package main
 
 import (
-	"fmt"
 	"os/exec"
 )
 
 type lazyLogString struct {
-	stringer fmt.Stringer
+	generator func() string
 }
 
 func (s lazyLogString) String() string {
-	return s.stringer.String()
+	return s.generator()
 }
 
 func (s lazyLogString) MarshalText() (text []byte, err error) {
-	return []byte(s.stringer.String()), nil
+	return []byte(s.generator()), nil
 }
 
 func getExePath(exe string) (path string, err error) {
