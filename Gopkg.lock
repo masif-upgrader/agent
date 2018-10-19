@@ -35,11 +35,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:61bb9b25ef7cf22683e8c6657d56633e7840ca4d13e5a0e5521b5f281e4fc549"
+  digest = "1:9d062c5435cb3e48876ad295079dc0232decbd8daf2db1e08259444a3d295066"
   name = "github.com/masif-upgrader/common"
   packages = ["."]
   pruneopts = "UT"
-  revision = "7e768493331e53a0aca419ea92ce9e36b872245f"
+  revision = "9355066c84d676cacb4e71ee304f3544696f70b8"
 
 [[projects]]
   digest = "1:3f53e9e4dfbb664cd62940c9c4b65a2171c66acd0b7621a1a6b8e78513525a52"

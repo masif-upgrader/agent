@@ -72,7 +72,7 @@ func runAgent() error {
 
 	sigListener := &signalListener{}
 	sigListener.onSignals(func(sig os.Signal) {
-		log.WithFields(log.Fields{"signal": lazyLogString{sig.String}}).Warn("Caught signal, exiting")
+		log.WithFields(log.Fields{"signal": common.LazyLogString{sig.String}}).Warn("Caught signal, exiting")
 		os.Exit(0)
 	}, syscall.SIGTERM, syscall.SIGINT)
 
@@ -206,7 +206,7 @@ func runAgent() error {
 
 					log.WithFields(log.Fields{
 						"package": nextPackage,
-						"error":   lazyLogString{errU.Error},
+						"error":   common.LazyLogString{errU.Error},
 					}).Error("Upgrade failed")
 
 					sleep(retryInterval)
@@ -328,7 +328,7 @@ func retryOp(op func() error, desc string) (err error) {
 		log.WithFields(log.Fields{
 			"operation": desc,
 			"try":       try,
-			"error":     lazyLogString{err.Error},
+			"error":     common.LazyLogString{err.Error},
 		}).Error("Failed")
 
 		sleep(retryInterval)
