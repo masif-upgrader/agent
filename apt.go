@@ -34,6 +34,10 @@ func newApt() (result *apt, err error) {
 	return
 }
 
+func (self *apt) getName() string {
+	return "APT"
+}
+
 func (self *apt) whatIfUpgradeAll(critOpRunner criticalOperationRunner) (tasks map[common.PkgMgrTask]struct{}, err error) {
 	critOpRunner.runCritical(func() {
 		tasks, err = self.whatIf("upgrade")
