@@ -3,7 +3,8 @@
 The **Masif Upgrader agent** is a component of *Masif Upgrader*.
 
 Consult Masif Upgrader's [manual] on its purpose
-and the agent's role in its architecture.
+and the agent's role in its architecture
+and [demo] for a full stack live demonstration.
 
 ## Configuration
 
@@ -23,6 +24,9 @@ host=infra-mgmt.intern.example.com:8150
 cert=/var/lib/puppet/ssl/certs/mail.example.com.pem
 key=/var/lib/puppet/ssl/private_keys/mail.example.com.pem
 ca=/var/lib/puppet/ssl/certs/ca.pem
+
+[log]
+level=info
 ```
 
 The *interval* section defines several intervals:
@@ -43,4 +47,12 @@ The *tls* section describes the X.509 PKI:
  key    | TLS client private key
  ca     | TLS server root CA certificate
 
+*log.level* defines the logging verbosity and is one of:
+
+* error
+* warning
+* info
+* debug
+
 [manual]: https://github.com/masif-upgrader/manual
+[demo]: https://github.com/masif-upgrader/demo
