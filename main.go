@@ -151,7 +151,7 @@ func runAgent() error {
 				}
 
 				nextPackage := ""
-				actionsNeeded := ^uint64(0)
+				var nextTasks map[common.PkgMgrTask]struct{} = nil
 
 			PossibleActions:
 				for task := range tasks {
@@ -182,9 +182,8 @@ func runAgent() error {
 							}
 						}
 
-						actionsNeededForUpgrade := uint64(len(tasksOnUpgrade))
-						if actionsNeededForUpgrade < actionsNeeded {
-							actionsNeeded = actionsNeededForUpgrade
+						if nextTasks == nil || len(tasksOnUpgrade) < len(nextTasks) {
+							nextTasks = tasksOnUpgrade
 							nextPackage = task.PackageName
 						}
 					}
@@ -198,7 +197,25 @@ func runAgent() error {
 
 				log.WithFields(log.Fields{"package": nextPackage}).Info("Upgrading")
 
-				if errU := ourPkgMgr.upgrade(sigListener, nextPackage); errU != nil {
+				start := time.Now()
+				errU := ourPkgMgr.upgrade(sigListener, nextPackage)
+				stop := time.Now()
+
+				if errU == nil {
+					actions := map[common.PkgMgrAction]uint64{}
+
+					for task := range nextTasks {
+						if _, hasAction := actions[task.Action]; hasAction {
+							actions[task.Action] += 1
+						} else {
+							actions[task.Action] = 1
+						}
+					}
+
+					for action, amount := range actions {
+						actionsStats[action].addDoneActions(amount, start, stop)
+					}
+				} else {
 					if retryInterval == zeroTime {
 						return errU
 					}
@@ -207,6 +224,8 @@ func runAgent() error {
 						"package": nextPackage,
 						"error":   common.LazyLogString{errU.Error},
 					}).Error("Upgrade failed")
+
+					errorStats.addDoneActions(1, start, stop)
 
 					sleep(retryInterval)
 				}
@@ -313,7 +332,11 @@ func retryOp(op func() error, desc string) (err error) {
 			"try":       try,
 		}).Info("Trying")
 
-		if err = op(); err == nil || retryInterval == zeroTime {
+		start := time.Now()
+		err = op()
+		stop := time.Now()
+
+		if err == nil || retryInterval == zeroTime {
 			if err == nil && try > 1 {
 				log.WithFields(log.Fields{
 					"operation": desc,
@@ -329,6 +352,8 @@ func retryOp(op func() error, desc string) (err error) {
 			"try":       try,
 			"error":     common.LazyLogString{err.Error},
 		}).Error("Failed")
+
+		errorStats.addDoneActions(1, start, stop)
 
 		sleep(retryInterval)
 	}
