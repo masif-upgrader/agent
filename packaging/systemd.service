@@ -9,6 +9,7 @@ StandardError=syslog
 KillMode=process
 TimeoutStopSec=infinity
 Restart=always
+RuntimeDirectory=masif-upgrader-agent
 
 [Install]
 WantedBy=multi-user.target
