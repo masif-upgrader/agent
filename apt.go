@@ -40,7 +40,7 @@ func (self *apt) getName() string {
 
 func (self *apt) whatIfUpgradeAll(critOpRunner criticalOperationRunner) (tasks map[common.PkgMgrTask]struct{}, err error) {
 	critOpRunner.runCritical(func() {
-		tasks, err = self.whatIf("upgrade")
+		tasks, err = self.whatIf("dist-upgrade")
 	})
 
 	return
@@ -48,14 +48,14 @@ func (self *apt) whatIfUpgradeAll(critOpRunner criticalOperationRunner) (tasks m
 
 func (self *apt) whatIfUpgrade(critOpRunner criticalOperationRunner, packageName string) (tasks map[common.PkgMgrTask]struct{}, err error) {
 	critOpRunner.runCritical(func() {
-		tasks, err = self.whatIf("upgrade", packageName)
+		tasks, err = self.whatIf("dist-upgrade", packageName)
 	})
 
 	return
 }
 
 func (self *apt) upgrade(critOpRunner criticalOperationRunner, packageName string) (err error) {
-	cmd := exec.Command(self.exe, "-yqq", "upgrade", packageName)
+	cmd := exec.Command(self.exe, "-yqq", "dist-upgrade", packageName)
 
 	cmd.Env = []string{"LC_ALL=C", "DEBIAN_FRONTEND=noninteractive", "PATH=" + os.Getenv("PATH")}
 	cmd.Dir = "/"
