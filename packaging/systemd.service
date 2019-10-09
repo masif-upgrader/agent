@@ -3,13 +3,15 @@ Description=Masif Upgrader (agent)
 After=syslog.target
 
 [Service]
-ExecStart=/usr/sbin/masif-upgrader-agent --config /etc/masif-upgrader/agent.ini
+ExecStart=/usr/sbin/masif-upgrader-agent --config /etc/masif-upgrader/agent.ini --restsock /var/run/masif-upgrader-agent/rest.s
 StandardOutput=syslog
 StandardError=syslog
 KillMode=process
 TimeoutStopSec=infinity
 Restart=always
+Group=masif-upgrader-agent
 RuntimeDirectory=masif-upgrader-agent
+RuntimeDirectoryMode=0750
 
 [Install]
 WantedBy=multi-user.target

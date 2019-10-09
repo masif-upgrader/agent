@@ -3,11 +3,14 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"flag"
 	"fmt"
 	pp "github.com/Al2Klimov/go-pretty-print"
 	"github.com/go-ini/ini"
+	"github.com/kataras/golog"
+	"github.com/kataras/iris"
 	"github.com/masif-upgrader/common"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ssh/terminal"
@@ -30,6 +33,7 @@ type settings struct {
 	log struct {
 		level log.Level
 	}
+	restsock string
 }
 
 var zeroTime = time.Duration(0)
@@ -68,10 +72,18 @@ func runAgent() error {
 	}
 
 	log.SetLevel(cfg.log.level)
+	golog.InstallStd(log.StandardLogger())
+
+	var restServer *iris.Application = nil
 
 	sigListener := &signalListener{}
 	sigListener.onSignals(func(sig os.Signal) {
 		log.WithFields(log.Fields{"signal": common.LazyLogString{sig.String}}).Warn("Caught signal, exiting")
+
+		if restServer != nil {
+			restServer.Shutdown(context.Background())
+		}
+
 		os.Exit(0)
 	}, syscall.SIGTERM, syscall.SIGINT)
 
@@ -92,6 +104,17 @@ func runAgent() error {
 	}
 
 	log.WithFields(log.Fields{"package_manager": ourPkgMgr.getName()}).Info("Auto-detected package manager")
+
+	{
+		var errRest error
+		sigListener.runCritical(func() {
+			restServer, errRest = startRestServer(cfg.restsock)
+		})
+
+		if errRest != nil {
+			return errRest
+		}
+	}
 
 	var tasks map[common.PkgMgrTask]struct{} = nil
 	retryInterval = time.Duration(cfg.interval.retry) * time.Second
@@ -255,6 +278,7 @@ func runAgent() error {
 
 func loadCfg() (config *settings, err error) {
 	cfgFile := flag.String("config", "", "config file")
+	restsock := flag.String("restsock", "", "ReST API socket path")
 	flag.Parse()
 
 	if *cfgFile == "" {
@@ -284,6 +308,7 @@ func loadCfg() (config *settings, err error) {
 			key:  cfgTls.Key("key").String(),
 			ca:   cfgTls.Key("ca").String(),
 		},
+		restsock: *restsock,
 	}
 
 	if result.interval.check <= 0 {
