@@ -3,11 +3,14 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"flag"
 	"fmt"
 	pp "github.com/Al2Klimov/go-pretty-print"
 	"github.com/go-ini/ini"
+	"github.com/kataras/golog"
+	"github.com/kataras/iris"
 	"github.com/masif-upgrader/common"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ssh/terminal"
@@ -30,6 +33,7 @@ type settings struct {
 	log struct {
 		level log.Level
 	}
+	restsock string
 }
 
 var zeroTime = time.Duration(0)
@@ -68,10 +72,18 @@ func runAgent() error {
 	}
 
 	log.SetLevel(cfg.log.level)
+	golog.InstallStd(log.StandardLogger())
+
+	var restServer *iris.Application = nil
 
 	sigListener := &signalListener{}
 	sigListener.onSignals(func(sig os.Signal) {
 		log.WithFields(log.Fields{"signal": common.LazyLogString{sig.String}}).Warn("Caught signal, exiting")
+
+		if restServer != nil {
+			restServer.Shutdown(context.Background())
+		}
+
 		os.Exit(0)
 	}, syscall.SIGTERM, syscall.SIGINT)
 
@@ -93,6 +105,17 @@ func runAgent() error {
 
 	log.WithFields(log.Fields{"package_manager": ourPkgMgr.getName()}).Info("Auto-detected package manager")
 
+	{
+		var errRest error
+		sigListener.runCritical(func() {
+			restServer, errRest = startRestServer(cfg.restsock)
+		})
+
+		if errRest != nil {
+			return errRest
+		}
+	}
+
 	var tasks map[common.PkgMgrTask]struct{} = nil
 	retryInterval = time.Duration(cfg.interval.retry) * time.Second
 	approvedTasks := map[common.PkgMgrTask]struct{}{}
@@ -102,7 +125,11 @@ func runAgent() error {
 		report: time.Duration(cfg.interval.report) * time.Second,
 	}
 	whatIfUpgradeAll := func() (err error) {
+		start := time.Now()
 		tasks, err = ourPkgMgr.whatIfUpgradeAll(sigListener)
+		stop := time.Now()
+
+		queryStats.addDoneActions(1, start, stop)
 		return
 	}
 
@@ -151,7 +178,7 @@ func runAgent() error {
 				}
 
 				nextPackage := ""
-				actionsNeeded := ^uint64(0)
+				var nextTasks map[common.PkgMgrTask]struct{} = nil
 
 			PossibleActions:
 				for task := range tasks {
@@ -161,7 +188,11 @@ func runAgent() error {
 						var tasksOnUpgrade map[common.PkgMgrTask]struct{}
 
 						errWIU := retryOp(func() (err error) {
+							start := time.Now()
 							tasksOnUpgrade, err = ourPkgMgr.whatIfUpgrade(sigListener, task.PackageName)
+							stop := time.Now()
+
+							queryStats.addDoneActions(1, start, stop)
 							return
 						}, ctxtWIU)
 						if errWIU != nil {
@@ -182,9 +213,8 @@ func runAgent() error {
 							}
 						}
 
-						actionsNeededForUpgrade := uint64(len(tasksOnUpgrade))
-						if actionsNeededForUpgrade < actionsNeeded {
-							actionsNeeded = actionsNeededForUpgrade
+						if nextTasks == nil || len(tasksOnUpgrade) < len(nextTasks) {
+							nextTasks = tasksOnUpgrade
 							nextPackage = task.PackageName
 						}
 					}
@@ -198,7 +228,25 @@ func runAgent() error {
 
 				log.WithFields(log.Fields{"package": nextPackage}).Info("Upgrading")
 
-				if errU := ourPkgMgr.upgrade(sigListener, nextPackage); errU != nil {
+				start := time.Now()
+				errU := ourPkgMgr.upgrade(sigListener, nextPackage)
+				stop := time.Now()
+
+				if errU == nil {
+					actions := map[common.PkgMgrAction]uint64{}
+
+					for task := range nextTasks {
+						if _, hasAction := actions[task.Action]; hasAction {
+							actions[task.Action] += 1
+						} else {
+							actions[task.Action] = 1
+						}
+					}
+
+					for action, amount := range actions {
+						actionsStats[action].addDoneActions(amount, start, stop)
+					}
+				} else {
 					if retryInterval == zeroTime {
 						return errU
 					}
@@ -207,6 +255,8 @@ func runAgent() error {
 						"package": nextPackage,
 						"error":   common.LazyLogString{errU.Error},
 					}).Error("Upgrade failed")
+
+					errorStats.addDoneActions(1, start, stop)
 
 					sleep(retryInterval)
 				}
@@ -236,6 +286,7 @@ func runAgent() error {
 
 func loadCfg() (config *settings, err error) {
 	cfgFile := flag.String("config", "", "config file")
+	restsock := flag.String("restsock", "", "ReST API socket path")
 	flag.Parse()
 
 	if *cfgFile == "" {
@@ -265,6 +316,7 @@ func loadCfg() (config *settings, err error) {
 			key:  cfgTls.Key("key").String(),
 			ca:   cfgTls.Key("ca").String(),
 		},
+		restsock: *restsock,
 	}
 
 	if result.interval.check <= 0 {
@@ -313,7 +365,11 @@ func retryOp(op func() error, desc string) (err error) {
 			"try":       try,
 		}).Info("Trying")
 
-		if err = op(); err == nil || retryInterval == zeroTime {
+		start := time.Now()
+		err = op()
+		stop := time.Now()
+
+		if err == nil || retryInterval == zeroTime {
 			if err == nil && try > 1 {
 				log.WithFields(log.Fields{
 					"operation": desc,
@@ -329,6 +385,8 @@ func retryOp(op func() error, desc string) (err error) {
 			"try":       try,
 			"error":     common.LazyLogString{err.Error},
 		}).Error("Failed")
+
+		errorStats.addDoneActions(1, start, stop)
 
 		sleep(retryInterval)
 	}

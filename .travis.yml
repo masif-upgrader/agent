@@ -10,6 +10,7 @@ before_script:
 script:
   - go mod download
   - .travis-ci/mk-pkgs.sh
+  - go test -failfast -race -v -cover
 
 deploy:
   provider: releases

@@ -47,9 +47,11 @@ Consult Masif Upgrader'"'"'s manual on its purpose and the agent'"'"'s role in i
 https://github.com/masif-upgrader/manual' \
 		--url 'https://github.com/masif-upgrader/agent' \
 		-p "${PKG_NAME}-${PKG_VERSION}-${LSBDISTID}-${DEB_ARCH}.deb" \
-		-d apt -d bash -d systemd --no-auto-depends \
+		-d adduser -d apt -d bash -d systemd --no-auto-depends \
 		--config-files /etc/masif-upgrader/agent.ini \
-		--after-install packaging/daemon-reload.sh --after-upgrade packaging/daemon-reload.sh --after-remove packaging/daemon-reload.sh \
+		--after-install packaging/on-install.sh \
+		--after-upgrade packaging/on-install.sh \
+		--after-remove packaging/on-remove.sh \
 		pkgpayload.tar
 }
 
