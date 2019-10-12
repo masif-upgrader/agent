@@ -125,7 +125,11 @@ func runAgent() error {
 		report: time.Duration(cfg.interval.report) * time.Second,
 	}
 	whatIfUpgradeAll := func() (err error) {
+		start := time.Now()
 		tasks, err = ourPkgMgr.whatIfUpgradeAll(sigListener)
+		stop := time.Now()
+
+		queryStats.addDoneActions(1, start, stop)
 		return
 	}
 
@@ -184,7 +188,11 @@ func runAgent() error {
 						var tasksOnUpgrade map[common.PkgMgrTask]struct{}
 
 						errWIU := retryOp(func() (err error) {
+							start := time.Now()
 							tasksOnUpgrade, err = ourPkgMgr.whatIfUpgrade(sigListener, task.PackageName)
+							stop := time.Now()
+
+							queryStats.addDoneActions(1, start, stop)
 							return
 						}, ctxtWIU)
 						if errWIU != nil {

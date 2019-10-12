@@ -10,4 +10,4 @@ var actionsStats = map[common.PkgMgrAction]*statsBookkeeper{
 	common.PkgMgrPurge:     {},
 }
 
-var errorStats statsBookkeeper
+var queryStats, errorStats statsBookkeeper

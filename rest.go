@@ -27,6 +27,7 @@ func startRestServer(sock string) (*iris.Application, error) {
 
 func getV1Load(context context.Context) {
 	context.JSON(&struct {
+		Query     [3]float64 `json:"query"`
 		Install   [3]float64 `json:"install"`
 		Update    [3]float64 `json:"update"`
 		Configure [3]float64 `json:"configure"`
@@ -34,6 +35,7 @@ func getV1Load(context context.Context) {
 		Purge     [3]float64 `json:"purge"`
 		Error     [3]float64 `json:"error"`
 	}{
+		queryStats.queryLoad(),
 		actionsStats[common.PkgMgrInstall].queryLoad(),
 		actionsStats[common.PkgMgrUpdate].queryLoad(),
 		actionsStats[common.PkgMgrConfigure].queryLoad(),
