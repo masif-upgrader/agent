@@ -5,12 +5,10 @@ go:
   - master
 
 before_script:
-  - curl -LSso "${GOPATH}/bin/dep" https://github.com/golang/dep/releases/download/v0.5.0/dep-linux-amd64
-  - chmod +x "${GOPATH}/bin/dep"
   - gem install fpm
 
 script:
-  - dep ensure
+  - go mod download
   - .travis-ci/mk-pkgs.sh
 
 deploy:

@@ -1,4 +1,4 @@
-//go:generate go run vendor/github.com/Al2Klimov/go-gen-source-repos/main.go github.com/masif-upgrader/agent
+//go:generate go run github.com/Al2Klimov/go-gen-source-repos
 
 package main
 
@@ -6,7 +6,6 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	_ "github.com/Al2Klimov/go-gen-source-repos"
 	pp "github.com/Al2Klimov/go-pretty-print"
 	"github.com/go-ini/ini"
 	"github.com/masif-upgrader/common"
