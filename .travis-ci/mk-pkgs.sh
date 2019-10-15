@@ -37,7 +37,7 @@ function mkDeb {
 
 	popd
 
-	SOURCE_DATE_EPOCH=1 fpm -s tar -t deb --log debug --verbose --debug \
+	SOURCE_DATE_EPOCH="$(git log -1 --format=%ct)" fpm -s tar -t deb --log debug --verbose --debug \
 		-n "$PKG_NAME" \
 		-v "$PKG_VERSION" \
 		-a "$DEB_ARCH" \
