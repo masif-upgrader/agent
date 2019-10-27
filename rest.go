@@ -7,6 +7,7 @@ import (
 	"github.com/masif-upgrader/common"
 	log "github.com/sirupsen/logrus"
 	"net"
+	"os"
 )
 
 func startRestServer(sock string) (*iris.Application, error) {
@@ -16,6 +17,8 @@ func startRestServer(sock string) (*iris.Application, error) {
 	if errLs != nil {
 		return nil, errLs
 	}
+
+	os.Chmod(sock, 0770)
 
 	app := iris.New()
 
