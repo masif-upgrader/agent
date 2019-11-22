@@ -3,6 +3,7 @@ module github.com/masif-upgrader/agent
 go 1.13
 
 require (
+	github.com/Al2Klimov/go-gen-source-repos v0.0.0-20191012103425-993a7199781c // indirect
 	github.com/Al2Klimov/go-pretty-print v0.0.0-20181020210249-508c8cfc87b9
 	github.com/Al2Klimov/go-test-utils v0.0.0-20181021140159-44f0ba1d3916 // indirect
 	github.com/BurntSushi/toml v0.3.1 // indirect
