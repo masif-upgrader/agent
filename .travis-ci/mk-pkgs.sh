@@ -69,8 +69,6 @@ cp packaging/config.ini pkgroot/etc/masif-upgrader/agent.ini
 cp packaging/systemd.service pkgroot/lib/systemd/system/masif-upgrader-agent.service
 
 
-go generate
-
 #     LSBDISTID DEB_ARCH GO_ARCH  GO_ENV
 
 mkDeb Debian    amd64    amd64    GO386=387
