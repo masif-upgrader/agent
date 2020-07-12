@@ -1,13 +1,13 @@
 package main
 
 import (
-	"github.com/kataras/iris"
-	"github.com/kataras/iris/context"
+	"net"
+	"os"
+
+	"github.com/kataras/iris/v12"
 	v1 "github.com/masif-upgrader/agent/v1"
 	"github.com/masif-upgrader/common"
 	log "github.com/sirupsen/logrus"
-	"net"
-	"os"
 )
 
 func startRestServer(sock string) (*iris.Application, error) {
@@ -29,8 +29,8 @@ func startRestServer(sock string) (*iris.Application, error) {
 	return app, nil
 }
 
-func getV1Load(context context.Context) {
-	context.JSON(&v1.Load{
+func getV1Load(ctx iris.Context) {
+	ctx.JSON(&v1.Load{
 		queryStats.queryLoad(),
 		actionsStats[common.PkgMgrInstall].queryLoad(),
 		actionsStats[common.PkgMgrUpdate].queryLoad(),
