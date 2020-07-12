@@ -10,7 +10,7 @@ import (
 	pp "github.com/Al2Klimov/go-pretty-print"
 	"github.com/go-ini/ini"
 	"github.com/kataras/golog"
-	"github.com/kataras/iris"
+	"github.com/kataras/iris/v12"
 	"github.com/masif-upgrader/common"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ssh/terminal"

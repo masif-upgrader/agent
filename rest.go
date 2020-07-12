@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/kataras/iris"
-	"github.com/kataras/iris/context"
+	"github.com/kataras/iris/v12"
+	"github.com/kataras/iris/v12/context"
 	v1 "github.com/masif-upgrader/agent/v1"
 	"github.com/masif-upgrader/common"
 	log "github.com/sirupsen/logrus"
