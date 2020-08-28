@@ -18,7 +18,8 @@ report=300
 retry=60
 
 [master]
-host=infra-mgmt.intern.example.com:8150
+host=192.0.2.1:8150
+cn=infra-mgmt.intern.example.com
 
 [tls]
 cert=/var/lib/puppet/ssl/certs/mail.example.com.pem
@@ -37,7 +38,12 @@ The *interval* section defines several intervals:
  report | Once any packages can be upgraded, report the set of required actions to upgrade all of them every x seconds to the master
  retry  | If any action fails, retry it after x seconds (0 or not set = don't retry anything)
 
-*master.host* is the master's address (HOST:PORT).
+The *master* section describes the master:
+
+ option | description
+ -------|------------------------------------
+ host   | Address (HOST:PORT)
+ cn     | X.509 certificate CN/SAN to require
 
 The *tls* section describes the X.509 PKI:
 

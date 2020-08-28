@@ -25,7 +25,7 @@ type settings struct {
 		check, report, retry int64
 	}
 	master struct {
-		host string
+		host, cn string
 	}
 	tls struct {
 		cert, key, ca string
@@ -87,7 +87,7 @@ func runAgent() error {
 		os.Exit(0)
 	}, syscall.SIGTERM, syscall.SIGINT)
 
-	master, errNA := newApi(cfg.master.host, cfg.tls)
+	master, errNA := newApi(cfg.master, cfg.tls)
 	if errNA != nil {
 		return errNA
 	}
@@ -308,8 +308,9 @@ func loadCfg() (config *settings, err error) {
 			report: cfgInterval.Key("report").MustInt64(),
 			retry:  cfgInterval.Key("retry").MustInt64(),
 		},
-		master: struct{ host string }{
+		master: struct{ host, cn string }{
 			host: cfg.Section("master").Key("host").String(),
+			cn:   cfg.Section("master").Key("cn").String(),
 		},
 		tls: struct{ cert, key, ca string }{
 			cert: cfgTls.Key("cert").String(),

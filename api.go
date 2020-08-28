@@ -24,7 +24,7 @@ type api struct {
 	client  *http.Client
 }
 
-func newApi(master string, tlsCfg struct{ cert, key, ca string }) (result *api, err error) {
+func newApi(master struct{ host, cn string }, tlsCfg struct{ cert, key, ca string }) (result *api, err error) {
 	log.WithFields(log.Fields{"cert": tlsCfg.cert, "key": tlsCfg.key}).Debug("Loading local TLS PKI")
 
 	clientCert, errLXKP := tls.LoadX509KeyPair(tlsCfg.cert, tlsCfg.key)
@@ -49,11 +49,12 @@ func newApi(master string, tlsCfg struct{ cert, key, ca string }) (result *api, 
 				RootCAs:      rootCAs,
 				CipherSuites: common.ApiTlsCipherSuites,
 				MinVersion:   common.ApiTlsMinVersion,
+				ServerName:   master.cn,
 			},
 		},
 	}
 
-	return &api{baseUrl: "https://" + master + "/v1", client: client}, nil
+	return &api{baseUrl: "https://" + master.host + "/v1", client: client}, nil
 }
 
 func (self *api) reportTasks(tasks map[common.PkgMgrTask]struct{}) (approvedTasks map[common.PkgMgrTask]struct{}, err error) {
