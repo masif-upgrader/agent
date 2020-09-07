@@ -8,7 +8,7 @@ require (
 	github.com/Al2Klimov/go-test-utils v0.0.0-20181021140159-44f0ba1d3916 // indirect
 	github.com/ajg/form v1.5.1 // indirect
 	github.com/fasthttp-contrib/websocket v0.0.0-20160511215533-1f3b11f56072 // indirect
-	github.com/go-ini/ini v1.60.2
+	github.com/go-ini/ini v1.61.0
 	github.com/google/go-querystring v1.0.0 // indirect
 	github.com/imkira/go-interpol v1.1.0 // indirect
 	github.com/k0kubun/colorstring v0.0.0-20150214042306-9440f1994b88 // indirect
