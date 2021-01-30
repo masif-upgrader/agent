@@ -7,16 +7,18 @@ import (
 	"fmt"
 	"github.com/masif-upgrader/common"
 	log "github.com/sirupsen/logrus"
+	"io"
 	"io/ioutil"
 	"net/http"
 )
 
 type badHttpStatus struct {
 	status int
+	body   []byte
 }
 
 func (self *badHttpStatus) Error() string {
-	return fmt.Sprintf("bad HTTP response status %d (expected 200)", self.status)
+	return fmt.Sprintf("bad HTTP response status %d (expected 200): %#v", self.status, string(self.body))
 }
 
 type api struct {
@@ -75,7 +77,10 @@ func (self *api) reportTasks(tasks map[common.PkgMgrTask]struct{}) (approvedTask
 	defer res.Body.Close()
 
 	if res.StatusCode != 200 {
-		return nil, &badHttpStatus{status: res.StatusCode}
+		var buf bytes.Buffer
+		io.Copy(&buf, res.Body)
+
+		return nil, &badHttpStatus{res.StatusCode, buf.Bytes()}
 	}
 
 	body, errRA := ioutil.ReadAll(res.Body)
