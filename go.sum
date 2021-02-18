@@ -139,6 +139,8 @@ github.com/magefile/mage v1.10.0/go.mod h1:z5UZb/iS3GoOSn0JgWuiw7dxlurVYTu+/jHXq
 github.com/magiconair/properties v1.8.0/go.mod h1:PppfXfuXeibc/6YijjN8zIbojt8czPbwD3XqdrwzmxQ=
 github.com/masif-upgrader/common v0.0.0-20181019182021-9355066c84d6 h1:GcP/2RDBnCzbL84SMHghrD0BfKs19raHVFpY+f4ZiBc=
 github.com/masif-upgrader/common v0.0.0-20181019182021-9355066c84d6/go.mod h1:v+9xDgUeR0QAZQ4qgmIjGyI24oo/wz4GUYk/il5g8cA=
+github.com/masif-upgrader/common v0.0.0-20210208204453-6cfe6fed4b82 h1:k7BNwlSwPXP3FkdIhAqaoKHXT/1+psW/YhKLSeV74vk=
+github.com/masif-upgrader/common v0.0.0-20210208204453-6cfe6fed4b82/go.mod h1:v+9xDgUeR0QAZQ4qgmIjGyI24oo/wz4GUYk/il5g8cA=
 github.com/mattn/go-colorable v0.1.7 h1:bQGKb3vps/j0E9GfJQ03JyhRuxsvdAanXlT9BTw3mdw=
 github.com/mattn/go-colorable v0.1.7/go.mod h1:u6P/XSegPjTcexA+o6vUJrdnUu04hMope9wVRipJSqc=
 github.com/mattn/go-isatty v0.0.12 h1:wuysRhFDzyxgEmMf5xjvJ2M9dZoWAXNNr5LSBS7uHXY=

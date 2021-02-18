@@ -14,7 +14,7 @@ require (
 	github.com/k0kubun/colorstring v0.0.0-20150214042306-9440f1994b88 // indirect
 	github.com/kataras/golog v0.1.7
 	github.com/kataras/iris/v12 v12.1.8
-	github.com/masif-upgrader/common v0.0.0-20181019182021-9355066c84d6
+	github.com/masif-upgrader/common v0.0.0-20210208204453-6cfe6fed4b82
 	github.com/mattn/go-colorable v0.1.7 // indirect
 	github.com/moul/http2curl v1.0.0 // indirect
 	github.com/onsi/ginkgo v1.14.0 // indirect
