@@ -3,7 +3,6 @@ module github.com/masif-upgrader/agent
 go 1.13
 
 require (
-	github.com/Al2Klimov/go-gen-source-repos v0.0.0-20200712150126-db66a45b2f66 // indirect
 	github.com/Al2Klimov/go-pretty-print v0.0.0-20181020210249-508c8cfc87b9
 	github.com/Al2Klimov/go-test-utils v0.0.0-20181021140159-44f0ba1d3916 // indirect
 	github.com/ajg/form v1.5.1 // indirect
@@ -12,7 +11,7 @@ require (
 	github.com/google/go-querystring v1.0.0 // indirect
 	github.com/imkira/go-interpol v1.1.0 // indirect
 	github.com/k0kubun/colorstring v0.0.0-20150214042306-9440f1994b88 // indirect
-	github.com/kataras/golog v0.1.7
+	github.com/kataras/golog v0.1.8
 	github.com/kataras/iris/v12 v12.1.8
 	github.com/masif-upgrader/common v0.0.0-20210208204453-6cfe6fed4b82
 	github.com/mattn/go-colorable v0.1.7 // indirect
